@@ -127,7 +127,7 @@
             const dayId = day.replace(/\s+/g, '');
             const fullCode = `<div class="main-btn" onclick="toggle('${dayId}')">► ${day}</div>
     <div id="${dayId}" class="section">
-        <div class="time-btn" onclick="toggle('time-${cls}')">${time} — PHIÊN HỌC</div>
+        <div class="time-btn" onclick="toggle('time-${cls}')">CA: ${time}</div>
         <div id="time-${cls}" class="section">
             <div class="class-btn" onclick="toggle('list${cls}')">LỚP ${cls} ▼</div>
             <div id="list${cls}" class="section" data-class="${cls}">
@@ -135,6 +135,7 @@
                 <div class="class-absent-list" id="absent-${cls}">Danh sách vắng: Không có</div>
                 <button class="btn-copy" onclick="copyAbsentList('${cls}')">📋 Copy danh sách vắng</button>
             </div>
+            <////////////////DÁN LỚP TIẾP THEO Ở BÊN DƯỚI//////////////>
         </div>
     </div>
     <//////////////////////////////thứ tiếp theo ở bên dưới nhé///////////////////////////////////>
