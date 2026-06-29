@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix-Pro Structure Generator</title>
+    <style>
+        body { margin: 30px 3px 0 3px; background: #0c0d0f; color: #00e5ff; font-family: 'Courier New', sans-serif; }
+        textarea { width: 100%; height: 120px; background: #1a1a1a; border: 1px solid #ff00ff; color: #fff; padding: 10px; border-radius: 5px; box-sizing: border-box; }
+        .row { margin: 10px 0; display: flex; gap: 5px; }
+        select, input { background: #1a1a1a; color: #fff; border: 1px solid #00e5ff; padding: 8px; flex: 1; border-radius: 3px; }
+        button { background: #00e5ff; border: none; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 3px; flex: 1; }
+        #output { background: #000; color: #fff; padding: 10px; border: 1px solid #ffd700; height: 300px; width: 100%; box-sizing: border-box; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: #ff00ff; text-align: center;">TẠO CẤU TRÚC LỚP (DROPDOWN)</h2>
+    
+    <div class="row">
+        <select id="dayDropdown">
+            <option value="THỨ 2">THỨ 2</option>
+            <option value="THỨ 3">THỨ 3</option>
+            <option value="THỨ 4">THỨ 4</option>
+            <option value="THỨ 5">THỨ 5</option>
+            <option value="THỨ 6">THỨ 6</option>
+            <option value="THỨ 7">THỨ 7</option>
+            <option value="CHỦ NHẬT">CHỦ NHẬT</option>
+        </select>
+        <select id="timeDropdown">
+            <option value="18:00">18:00</option>
+            <option value="18:15">18:15</option>
+            <option value="18:30">18:30</option>
+            <option value="19:00">19:00</option>
+        </select>
+        <input type="text" id="className" placeholder="Tên Lớp (vd: SKY-KID)">
+    </div>
+    
+    <textarea id="rawInput" placeholder="Dán danh sách (Tên, SĐT) tại đây..."></textarea>
+    
+    <div class="row">
+        <button onclick="generate()">TẠO MÃ CẤU TRÚC</button>
+        <button onclick="copyCode()" style="background: #ffd700; color: #000;">COPY MÃ</button>
+    </div>
+
+    <textarea id="output" readonly></textarea>
+
+    <script>
+        function generate() {
+            const day = document.getElementById('dayDropdown').value;
+            const time = document.getElementById('timeDropdown').value;
+            const cls = document.getElementById('className').value || 'CLASS';
+            const input = document.getElementById('rawInput').value;
+            const lines = input.split('\n');
+            
+            let studentHtml = "";
+            lines.forEach((line, index) => {
+                let parts = line.trim().split(/,|\t|\s{3,}/);
+                if (parts.length >= 2) {
+                    let name = parts[0].trim();
+                    let phone = parts[1].replace(/\D/g, '');
+                    let sid = "st" + (index + 1);
+                    studentHtml += `
+                <div class="student-card" id="${sid}">
+                    <div>${index + 1}. ${name}</div>
+                    <div class="btn-group">
+                        <button class="btn-yes" onclick="setAttendance('${sid}', false, '${cls}')">Có mặt</button>
+                        <button class="btn-no" onclick="setAttendance('${sid}', true, '${cls}')">Vắng</button>
+                        <a href="tel:${phone}" class="btn-call">📞 Gọi</a>
+                    </div>
+                    <select onchange="updateClassAbsentList('${cls}')">
+                        <option value="">-- Ghi chú --</option>
+                        <option value="Nghỉ phép">Nghỉ phép</option>
+                        <option value="Đi muộn">Đi muộn</option>
+                        <option value="Quên sách">Quên sách</option>
+                    </select>
+                </div>`;
+                }
+            });
+
+            const dayId = day.replace(/\s+/g, '');
+            const fullCode = `<div class="main-btn" onclick="toggle('${dayId}')">► ${day}</div>
+    <div id="${dayId}" class="section">
+        <div class="time-btn" onclick="toggle('time-${cls}')">${time} — PHIÊN HỌC</div>
+        <div id="time-${cls}" class="section">
+            <div class="class-btn" onclick="toggle('list${cls}')">LỚP ${cls} ▼</div>
+            <div id="list${cls}" class="section" data-class="${cls}">
+                ${studentHtml}
+                <div class="class-absent-list" id="absent-${cls}">Danh sách vắng: Không có</div>
+                <button class="btn-copy" onclick="copyAbsentList('${cls}')">📋 Copy danh sách vắng</button>
+            </div>
+        </div>
+    </div>`;
+            document.getElementById('output').value = fullCode;
+        }
+
+        function copyCode() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            alert('Đã copy mã!');
+        }
+    </script>
+</body>
+</html>
